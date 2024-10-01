@@ -1,5 +1,6 @@
 import express, { Request, Response, urlencoded } from "express";
 import dotenv from "dotenv";
+dotenv.config();
 import https from "https";
 import fs from "fs";
 import { connectDB } from "./src/config/db";
@@ -9,8 +10,6 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-
-dotenv.config();
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -34,12 +33,7 @@ app.use(helmet());
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-    cors({
-        origin: "https://localhost:3000",
-        credentials: true,
-    }),
-);
+app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use("/api", routes);
 
@@ -48,7 +42,12 @@ app.get("/", (req: Request, res: Response) => {
     return res.json({ message: "hello world" });
 });
 
-https.createServer({}, app).listen(port, async () => {
+// https.createServer(options, app).listen(port, async () => {
+//     await connectDB();
+//     console.log(`[server]: Server is running at https://localhost:${port}`);
+// });
+
+app.listen(port, async() => {
     await connectDB();
     console.log(`[server]: Server is running at https://localhost:${port}`);
-});
+})
